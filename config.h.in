@@ -1,0 +1,2 @@
+#define ChatShare_VERSION_MAJOR @ChatShare_VERSION_MAJOR@
+#define ChatShare_VERSION_MINOR @ChatShare_VERSION_MINOR@
