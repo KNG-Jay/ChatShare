@@ -1,0 +1,21 @@
+{
+  "name" : "chatshare",
+  "version-string" : "1.0.0",
+  "builtin-baseline" : "365f6444ab40ee87c73c947b475b3a267b3cb77c",
+  "dependencies" : [ {
+    "name" : "boost-asio",
+    "version>=" : "1.89.0"
+  }, {
+    "name" : "gtest",
+    "version>=" : "1.17.0"
+  }, {
+    "name" : "libpqxx",
+    "version>=" : "7.10.1"
+  }, {
+    "name" : "poco",
+    "version>=" : "1.14.1"
+  }, {
+    "name" : "reflectcpp",
+    "version>=" : "0.22.0"
+  } ]
+}

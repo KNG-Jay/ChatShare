@@ -1,5 +1,7 @@
 #include <iostream>
-#include "config.h"
+#include "../config.h"
+#include "../include/ChatShare.h"
+
 
 using namespace std;
 

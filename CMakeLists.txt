@@ -1,9 +1,13 @@
-cmake_minimum_required(VERSION 4.0)
+cmake_minimum_required(VERSION 3.15)
 
 project(ChatShare
     VERSION 0.1
     DESCRIPTION "A Live Application That Allows Users To Share Files And Also Real-Time Chat"
 )
+
+add_subdirectory(db-engine)
+add_subdirectory(client)
+add_subdirectory(server)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -12,18 +16,28 @@ set(CMAKE_C_COMPILER "clang")
 set(CMAKE_CXX_COMPILER "clang++")
 
 # Set the CMake toolchain file path for vcpkg
-#set(CMAKE_TOOLCHAIN_FILE "$ENV{HOME}/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
-
+set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
+set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};vcpkg_installed/${CMAKE_SYSTEM_PROCESSOR}")
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 enable_testing()
 
-find_package(GTest CONFIG REQUIRED)
+#find_package(GTest CONFIG REQUIRED)
+#find_package(libpqxx CONFIG REQUIRED)
+#find_package(boost_asio_core CONFIG REQUIRED)
+#find_package(Poco REQUIRED COMPONENTS Foundation)
+#find_package(reflectcpp CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
-#add_executable(runUnitTests test/ src/)
+add_executable(runUnitTests
+        test/ChatShareTests.cpp
+        src/ChatShare.cpp
+        db-engine/src/DBEngine.cpp
+        client/src/Client.cpp
+        server/src/Server.cpp
+)
 
-configure_file(config.h.in config.h)
+configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
 
 target_include_directories(${PROJECT_NAME}
         PUBLIC
@@ -31,8 +45,11 @@ target_include_directories(${PROJECT_NAME}
         "${CMAKE_SOURCE_DIR}/include"
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
-#target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
+add_library(shared SHARED src/main.cpp)
+
+#target_link_libraries(shared PUBLIC GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)  # ADD reflectorcpp::reflectorcpp
+target_link_libraries(${PROJECT_NAME} PRIVATE shared)
+target_link_libraries(runUnitTests PRIVATE shared)
 
 #add_test(AllTestsInMain ${PROJECT_NAME})
 include(GoogleTest)
