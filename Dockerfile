@@ -38,8 +38,9 @@ EXPOSE 8081
 COPY . .
 
 # Install Library Dependencies Then Build Project
-RUN $VCPKG_ROOT/vcpkg integrate install && $VCPKG_ROOT/vcpkg install
-RUN mkdir build && cmake -S . -B build -G Ninja && ls
+RUN $VCPKG_ROOT/vcpkg integrate install
+# RUN $VCPKG_ROOT/vcpkg install
+RUN mkdir build && cmake -S . -B build -G Ninja && cmake --build build
 
 # Run Project
 CMD ["/bin/sh", "ls"]
