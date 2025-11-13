@@ -4,3 +4,10 @@
 
 #include "../include/DBEngine.h"
 
+
+DBEngine::DBEngine() :
+    conn() {}
+    
+DBEngine::~DBEngine() {}
+
+
