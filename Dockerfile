@@ -39,11 +39,9 @@ COPY . .
 
 # Install Library Dependencies Then Build Project
 RUN $VCPKG_ROOT/vcpkg integrate install
-# RUN $VCPKG_ROOT/vcpkg install
+RUN $VCPKG_ROOT/vcpkg install
 RUN mkdir build && cmake -S . -B build -G Ninja && cmake --build build
 
 # Run Project
-CMD ["/bin/sh", "ls"]
-#CMD ["./build/runUnitTests"]
-#CMD ["./build/ChatShare"]
+CMD ["./build/runUnitTests"]
 ENTRYPOINT ["./build/ChatShare"]

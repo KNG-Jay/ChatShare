@@ -17,16 +17,20 @@ set(CMAKE_CXX_COMPILER "clang++")
 
 # Set the CMake toolchain file path for vcpkg
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
-set(CMAKE_PREFIX_PATH "${CMAKE_PREFIX_PATH};vcpkg_installed/${CMAKE_SYSTEM_PROCESSOR}")
+if(CMAKE_SYSTEM_PROCESSOR STREQUAL "aarch64")
+    set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vcpkg_installed/arm64-linux")
+else()
+    set(CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/vcpkg_installed/amd64-linux")
+endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 enable_testing()
 
-#find_package(GTest CONFIG REQUIRED)
-#find_package(libpqxx CONFIG REQUIRED)
-#find_package(boost_asio_core CONFIG REQUIRED)
-#find_package(Poco REQUIRED COMPONENTS Foundation)
-#find_package(reflectcpp CONFIG REQUIRED)
+find_package(GTest CONFIG REQUIRED)
+find_package(libpqxx CONFIG REQUIRED)
+find_package(boost_asio_core CONFIG REQUIRED)
+find_package(Poco REQUIRED COMPONENTS Foundation)
+find_package(reflectcpp CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 add_executable(runUnitTests
@@ -47,7 +51,7 @@ target_include_directories(${PROJECT_NAME}
 
 add_library(shared SHARED src/main.cpp)
 
-#target_link_libraries(shared PUBLIC GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)  # ADD reflectorcpp::reflectorcpp
+target_link_libraries(shared PUBLIC GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)  # ADD reflectorcpp::reflectorcpp
 target_link_libraries(${PROJECT_NAME} PRIVATE shared)
 target_link_libraries(runUnitTests PRIVATE shared)
 
