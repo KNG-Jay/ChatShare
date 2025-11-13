@@ -5,5 +5,8 @@
 #ifndef CHATSHARE_DBENGINE_H
 #define CHATSHARE_DBENGINE_H
 
+#include <pqxx/pqxx>
+
+
 
 #endif //CHATSHARE_DBENGINE_H

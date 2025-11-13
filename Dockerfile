@@ -23,6 +23,17 @@ RUN apt-get update && apt-get install -y \
     bison \
     flex \
     autoconf \
+    autoconf-archive \
+    automake \
+    libtool \
+    '^libxcb.*-dev' \
+    libx11-xcb-dev \
+    libglu1-mesa-dev \
+    libxrender-dev \
+    libxi-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    libegl1-mesa-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install vcpkg

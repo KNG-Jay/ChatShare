@@ -1,13 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 
+#cmake_policy(SET CMP0167 NEW)
+
 project(ChatShare
     VERSION 0.1
     DESCRIPTION "A Live Application That Allows Users To Share Files And Also Real-Time Chat"
 )
-
-add_subdirectory(db-engine)
-add_subdirectory(client)
-add_subdirectory(server)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -28,9 +26,14 @@ enable_testing()
 
 find_package(GTest CONFIG REQUIRED)
 find_package(libpqxx CONFIG REQUIRED)
-find_package(boost_asio_core CONFIG REQUIRED)
-find_package(Poco REQUIRED COMPONENTS Foundation)
 find_package(reflectcpp CONFIG REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system coroutine regex asio)
+find_package(Poco REQUIRED COMPONENTS Foundation)
+find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+
+add_subdirectory(db-engine)
+add_subdirectory(client)
+add_subdirectory(server)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 add_executable(runUnitTests
@@ -51,9 +54,11 @@ target_include_directories(${PROJECT_NAME}
 
 add_library(shared SHARED src/main.cpp)
 
-target_link_libraries(shared PUBLIC GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)  # ADD reflectorcpp::reflectorcpp
+target_link_libraries(shared PUBLIC reflectcpp::reflectcpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE shared)
-target_link_libraries(runUnitTests PRIVATE shared)
+target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main libpqxx::pqxx shared)
 
-#add_test(AllTestsInMain ${PROJECT_NAME})
 include(GoogleTest)
+gtest_add_tests(TARGET runUnitTests
+                TEST_PREFIX test_
+                TEST_SOURCES test/ChatShareTests.cpp test/ClientTests.cpp test/DBEngineTests.cpp test/ServerTests.cpp)
