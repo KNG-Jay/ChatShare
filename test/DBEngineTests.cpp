@@ -3,4 +3,14 @@
 //
 
 #include "../db-engine/include/DBEngine.h"
+#include <gtest/gtest.h>
 
+TEST(DBEngineTests, CreateConnection) {
+    DBEngine engine;
+
+    engine.create_connection();
+    ASSERT_TRUE(engine.conn.is_open());
+
+    engine.drop_connection();
+    ASSERT_FALSE(engine.conn.is_open());
+}

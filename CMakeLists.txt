@@ -26,6 +26,10 @@ enable_testing()
 
 find_package(GTest CONFIG REQUIRED)
 find_package(libpqxx CONFIG REQUIRED)
+find_package(PostgreSQL REQUIRED)
+message(STATUS "PostgreSQL include dirs: ${PostgreSQL_INCLUDE_DIRS}")
+message(STATUS "PostgreSQL libraries: ${PostgreSQL_LIBRARIES}")
+include_directories(${PostgreSQL_INCLUDE_DIRS})
 find_package(reflectcpp CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system coroutine regex asio)
 find_package(Poco REQUIRED COMPONENTS Foundation)
@@ -38,6 +42,9 @@ add_subdirectory(server)
 add_executable(${PROJECT_NAME} src/main.cpp)
 add_executable(runUnitTests
         test/ChatShareTests.cpp
+        test/DBEngineTests.cpp
+        test/ClientTests.cpp
+        test/ServerTests.cpp
         src/ChatShare.cpp
         db-engine/src/DBEngine.cpp
         client/src/Client.cpp
@@ -56,7 +63,7 @@ add_library(shared SHARED src/main.cpp)
 
 target_link_libraries(shared PUBLIC reflectcpp::reflectcpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE shared)
-target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main libpqxx::pqxx shared)
+target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main shared db-engine)
 
 include(GoogleTest)
 gtest_add_tests(TARGET runUnitTests

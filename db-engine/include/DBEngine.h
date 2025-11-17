@@ -7,6 +7,8 @@
 
 
 #include <iostream>
+#include <print>
+#include <libpq-fe.h>
 #include <pqxx/pqxx>
 
 
@@ -15,8 +17,21 @@ public:
     DBEngine();
     ~DBEngine();
 
-private:
+    void create_connection();
+    void drop_connection();
+    void check_database();
+    void post_msg();
+    void post_directory();
+    void post_user();
+    void get_msg_log();
+    void get_directory();
+    void get_directory_list();
+    void get_user();
+
+    std::string conn_string;
     pqxx::connection conn;
+
+private:
 
 };
 
