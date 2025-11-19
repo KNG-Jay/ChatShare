@@ -18,7 +18,7 @@ public:
     void create_connection();
     void drop_connection();
     void check_database();
-    void post_user(std::string name, bool admin);
+    void post_user(std::string user_name, std::string name, bool admin);
     void post_msg(std::string user_name, std::string message);        // TODO:()        
     void post_directory(std::string user_name, std::string file_name, std::string file_data);      // TODO:()
     pqxx::result get_user(std::string user_name);
@@ -35,6 +35,9 @@ public:
 private:
 
 };
+
+
+std::time_t get_timestamp();
 
 
 #endif //CHATSHARE_DBENGINE_H

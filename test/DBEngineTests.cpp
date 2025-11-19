@@ -4,6 +4,7 @@
 
 #include "../db-engine/include/DBEngine.h"
 #include <gtest/gtest.h>
+#include <print>
 
 TEST(DBEngineTests, CreateConnection) {
     DBEngine engine;
@@ -33,4 +34,11 @@ TEST(DBEngineTests, ChatDataTransaction) {      // TODO: ( post_msg(std::string 
 
 TEST(DBEngineTests, FileDataTransaction) {      // TODO: ( post_directory(std::string user_name, std::string file_name, std::string file_data) || get_directory(std::string file_name) || get_directory_list() )
 
+}
+
+TEST(DBEngineTests, TimestampFunctional) {
+    std::time_t utc_stamp = get_timestamp();
+    
+    std::println("UTC Timestamp Received: {}", utc_stamp);
+    ASSERT_TRUE(utc_stamp > 0);
 }

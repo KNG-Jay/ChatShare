@@ -6,6 +6,10 @@
 #include "pqxx/internal/statement_parameters.hxx"
 #include <exception>
 #include <print>
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <system_error>
 
 
 DBEngine::DBEngine() :
@@ -50,7 +54,7 @@ void DBEngine::check_database() {
         throw;
     }
 
-    if (this->table_count < 3) {
+    if (this->table_count > 4 && this->table_count < 3) {
         try { 
         pqxx::work trx{this->conn};
         trx.exec("\
@@ -97,7 +101,7 @@ void DBEngine::check_database() {
     }
 }
 
-void DBEngine::post_user(std::string name, bool admin) {
+void DBEngine::post_user(std::string user_name, std::string name, bool admin) {
 
 }
 
@@ -107,4 +111,21 @@ pqxx::result DBEngine::get_user(std::string user_name) {     // TODO:( Messages 
 
 pqxx::result DBEngine::get_user_list() {
 
+}
+
+
+std::time_t get_timestamp() {
+    std::println("Retrieving Timestamp In UTC...");
+    std::chrono::utc_clock clock;
+
+    try {
+        const std::chrono::time_point now = clock.now();
+        const auto time_since_epoch = now.time_since_epoch();
+        const std::time_t utc_stamp =
+            std::chrono::duration_cast<std::chrono::seconds>(time_since_epoch).count();
+        return utc_stamp;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get Timestamp: {}", ex.what());
+        throw;
+    }
 }
