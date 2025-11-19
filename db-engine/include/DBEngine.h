@@ -28,6 +28,7 @@ public:
 
     std::string conn_string;
     pqxx::connection conn;
+    int table_count;
 
 private:
 

@@ -14,3 +14,11 @@ TEST(DBEngineTests, CreateConnection) {
     engine.drop_connection();
     ASSERT_FALSE(engine.conn.is_open());
 }
+
+TEST(DBEngineTests, CheckDBIntegrity) {
+    DBEngine engine;
+    engine.create_connection();
+
+    engine.check_database();
+    ASSERT_EQ(engine.table_count, 4);
+}

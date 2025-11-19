@@ -58,9 +58,9 @@ COPY . .
 # Install Library Dependencies Then Build Project
 RUN $VCPKG_ROOT/vcpkg integrate install
 RUN $VCPKG_ROOT/vcpkg install
-RUN mkdir build && \
-    CC=clang CXX=clang++ cmake -S . -B build -G Ninja && \
-    cmake --build build
+RUN mkdir build
+RUN cmake -S . -B build -G Ninja
+RUN cmake --build build
 
 # Run Project
 CMD ["./build/runUnitTests"]
