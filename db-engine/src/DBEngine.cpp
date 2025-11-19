@@ -3,6 +3,7 @@
 //
 
 #include "../include/DBEngine.h"
+#include <iostream>
 #include <exception>
 #include <print>
 
@@ -20,7 +21,7 @@ void DBEngine::create_connection() {
         if (conn.is_open()) std::println("Database Connection Active!");
         else throw pqxx::broken_connection("Connection Failed To Connect And/Or Remain Open");
     } catch(pqxx::broken_connection ex) {
-        std::println("[ERROR] Failed To Connect To Database: {}", ex.what());
+        std::println("[ERROR] Failed To Connect To Database: %s", ex.what());
     }
 }
 
@@ -30,7 +31,7 @@ void DBEngine::drop_connection() {
         conn.close();
         std::println("Connection Has Been Closed");
     } catch(std::exception ex) {
-        std::println("[ERROR] Failed To Drop Connection: {}", ex.what());
+        std::println("[ERROR] Failed To Drop Connection: %s", ex.what());
     }
 }
 

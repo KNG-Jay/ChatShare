@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.15)
 
-cmake_policy(SET CMP0167 NEW)
+#cmake_policy(SET CMP0167 NEW)
 
 project(ChatShare
     VERSION 0.1
@@ -9,9 +9,12 @@ project(ChatShare
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-set(CMAKE_C_COMPILER "clang")
-set(CMAKE_CXX_COMPILER "clang++")
+set(CMAKE_C_COMPILER /usr/bin/clang)
+set(CMAKE_CXX_COMPILER /usr/bin/clang++)
+add_compile_options(-std=c++23)
+
 
 # Set the CMake toolchain file path for vcpkg
 set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
@@ -22,18 +25,27 @@ else()
 endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-enable_testing()
+include(FetchContent)
 
-find_package(GTest CONFIG REQUIRED)
-find_package(libpqxx CONFIG REQUIRED)
+FetchContent_Declare(
+    libpqxx
+    GIT_REPOSITORY https://github.com/jtv/libpqxx.git
+    GIT_TAG 170eafbde0ff6ee3a3879416eeeaf318e7621455
+)
+set(PQXX_LIBRARIES pqxx_static)
+
+FetchContent_MakeAvailable(libpqxx)
+
 find_package(PostgreSQL REQUIRED)
 message(STATUS "PostgreSQL include dirs: ${PostgreSQL_INCLUDE_DIRS}")
 message(STATUS "PostgreSQL libraries: ${PostgreSQL_LIBRARIES}")
-include_directories(${PostgreSQL_INCLUDE_DIRS})
+#find_package(libpqxx CONFIG REQUIRED)
+
+find_package(GTest CONFIG REQUIRED)
 find_package(reflectcpp CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system coroutine regex asio)
 find_package(Poco REQUIRED COMPONENTS Foundation)
-find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
+#find_package(Qt6 REQUIRED COMPONENTS Core Widgets)
 
 add_subdirectory(db-engine)
 add_subdirectory(client)
@@ -53,18 +65,24 @@ add_executable(runUnitTests
 
 configure_file(config.h.in ${CMAKE_HOME_DIRECTORY}/config.h)
 
-target_include_directories(${PROJECT_NAME}
-        PUBLIC
+target_include_directories(${PROJECT_NAME} PUBLIC
         "${PROJECT_BINARY_DIR}"
         "${CMAKE_SOURCE_DIR}/include"
+)
+
+target_include_directories(runUnitTests PUBLIC
+        "${PROJECT_BINARY_DIR}"
+        "${CMAKE_SOURCE_DIR}/test"
+        "${CMAKE_SOURCE_DIR}/db-engine/include"
 )
 
 add_library(shared SHARED src/main.cpp)
 
 target_link_libraries(shared PUBLIC reflectcpp::reflectcpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE shared)
-target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main shared db-engine)
+target_link_libraries(${PROJECT_NAME} PRIVATE shared db-engine)
+target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main db-engine)
 
+enable_testing()
 include(GoogleTest)
 gtest_add_tests(TARGET runUnitTests
                 TEST_PREFIX test_

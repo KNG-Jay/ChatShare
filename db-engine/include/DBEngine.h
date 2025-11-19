@@ -6,10 +6,8 @@
 #define CHATSHARE_DBENGINE_H
 
 
-#include <iostream>
-#include <print>
-#include <libpq-fe.h>
 #include <pqxx/pqxx>
+#include <string>
 
 
 class DBEngine {

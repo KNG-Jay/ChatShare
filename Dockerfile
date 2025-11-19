@@ -1,20 +1,17 @@
 # Gather Base Image For Container
-FROM ubuntu:latest
+FROM ubuntu:24.04
 
 # Name Of Author
 LABEL authors="kng"
 
-# Working Directory
-WORKDIR /app
-
 # Update And Install Tools Needed For Development
-RUN apt-get update && apt-get install -y \
-    build-essential \
+RUN apt update && apt install -y \
     bash \
     clang \
     cmake \
     ninja-build \
     git \
+    build-essential \
     curl \
     zip \
     unzip \
@@ -25,6 +22,9 @@ RUN apt-get update && apt-get install -y \
     autoconf \
     autoconf-archive \
     automake \
+    #libstdc++-14-dev \
+    libc++-dev \
+    libc++abi-dev \
     libtool \
     '^libxcb.*-dev' \
     libx11-xcb-dev \
@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y \
     libxkbcommon-dev \
     libxkbcommon-x11-dev \
     libegl1-mesa-dev \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install vcpkg
@@ -41,9 +42,15 @@ RUN git clone https://github.com/microsoft/vcpkg.git /vcpkg && \
     cd /vcpkg && \
     ./bootstrap-vcpkg.sh
 
+#RUN echo "export CC=$(which clang)" && echo "export CXX=$(which clang++)"
+
 # Environment Variables
+ENV CC=clang CXX=clang++
 ENV VCPKG_ROOT=/vcpkg
 EXPOSE 8081
+
+# Working Directory
+WORKDIR /app
 
 # Copy Contents Of Project Directory Into Image
 COPY . .
@@ -51,7 +58,9 @@ COPY . .
 # Install Library Dependencies Then Build Project
 RUN $VCPKG_ROOT/vcpkg integrate install
 RUN $VCPKG_ROOT/vcpkg install
-RUN mkdir build && cmake -S . -B build -G Ninja && cmake --build build
+RUN mkdir build && \
+    CC=clang CXX=clang++ cmake -S . -B build -G Ninja && \
+    cmake --build build
 
 # Run Project
 CMD ["./build/runUnitTests"]

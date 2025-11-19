@@ -1,17 +1,14 @@
 {
   "name": "chatshare",
   "version-string": "1.0.0",
-  "builtin-baseline": "365f6444ab40ee87c73c947b475b3a267b3cb77c",
+  "builtin-baseline": "dfb72f61c5a066ab75cd0bdcb2e007228bfc3270",
   "dependencies": [
     "boost-asio",
     "boost-coroutine",
     "boost-regex",
     "boost-system",
     "gtest",
-    "libpq",
-    "libpqxx",
     "poco",
-    "qtbase",
     "reflectcpp"
   ]
 }
