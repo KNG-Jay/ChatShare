@@ -18,13 +18,15 @@ public:
     void create_connection();
     void drop_connection();
     void check_database();
-    void post_msg();
-    void post_directory();
-    void post_user();
-    void get_msg_log();
-    void get_directory();
-    void get_directory_list();
-    void get_user();
+    void post_user(std::string name, bool admin);
+    void post_msg(std::string user_name, std::string message);        // TODO:()        
+    void post_directory(std::string user_name, std::string file_name, std::string file_data);      // TODO:()
+    pqxx::result get_user(std::string user_name);
+    pqxx::result get_user_list();
+    pqxx::result get_msg_usr(std::string user_name);        // TODO:()
+    pqxx::result get_msg_log();     // TODO:()
+    pqxx::result get_directory(std::string file_name);      // TODO:()
+    pqxx::result get_directory_list();      // TODO:()
 
     std::string conn_string;
     pqxx::connection conn;

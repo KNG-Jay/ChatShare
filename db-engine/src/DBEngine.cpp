@@ -4,7 +4,6 @@
 
 #include "../include/DBEngine.h"
 #include "pqxx/internal/statement_parameters.hxx"
-#include <iostream>
 #include <exception>
 #include <print>
 
@@ -51,12 +50,14 @@ void DBEngine::check_database() {
         throw;
     }
 
-    try { 
+    if (this->table_count < 3) {
+        try { 
         pqxx::work trx{this->conn};
         trx.exec("\
             CREATE TABLE IF NOT EXISTS user_data ( \
             ID INT PRIMARY KEY, \
             user_name VARCHAR(50), \
+            password VARCHAR(50), \
             admin BOOLEAN, \
             created TIMESTAMP, \
             modified TIMESTAMP \
@@ -78,19 +79,32 @@ void DBEngine::check_database() {
             created TIMESTAMP \
             );");
         trx.commit();
-    } catch(const std::exception& ex) {
-        std::println("[ERROR] FAILED TO CREATE TABLES: {}", ex.what());
-        throw;
-    }
+        } catch(const std::exception& ex) {
+            std::println("[ERROR] FAILED TO CREATE TABLES: {}", ex.what());
+            throw;
+        }
 
-    try {
-        pqxx::work trx{this->conn};
-        res = trx.exec("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
-        this->table_count = res.size();
-        std::println("[POSTCHECK] Tables In Database: {}", this->table_count);
-        res.clear();
-    } catch(const std::exception& ex) {
-        std::println("[ERROR] FAILED TO CREATE TABLES: {}", ex.what());
-        throw;
+        try {
+            pqxx::work trx{this->conn};
+            res = trx.exec("SELECT tablename FROM pg_tables WHERE schemaname = 'public'");
+            this->table_count = res.size();
+            std::println("[POSTCHECK] Tables In Database: {}", this->table_count);
+            res.clear();
+        } catch(const std::exception& ex) {
+            std::println("[ERROR] FAILED TO CREATE TABLES: {}", ex.what());
+            throw;
+        }
     }
+}
+
+void DBEngine::post_user(std::string name, bool admin) {
+
+}
+
+pqxx::result DBEngine::get_user(std::string user_name) {     // TODO:( Messages Sent && Files Sent/Received )
+
+}
+
+pqxx::result DBEngine::get_user_list() {
+
 }

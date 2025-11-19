@@ -20,5 +20,17 @@ TEST(DBEngineTests, CheckDBIntegrity) {
     engine.create_connection();
 
     engine.check_database();
-    ASSERT_EQ(engine.table_count, 4);
+    ASSERT_EQ(engine.table_count, 3);
+}
+
+TEST(DBEngineTests, UserDataTransaction) {     // TODO: ( post_user(std::string name, bool admin) || get_user(std::string user_name) || get_user_list() )
+
+}
+
+TEST(DBEngineTests, ChatDataTransaction) {      // TODO: ( post_msg(std::string user_name, std::string message) || get_msg_usr(std::string user_name) || get_msg_log() )
+
+}
+
+TEST(DBEngineTests, FileDataTransaction) {      // TODO: ( post_directory(std::string user_name, std::string file_name, std::string file_data) || get_directory(std::string file_name) || get_directory_list() )
+
 }
