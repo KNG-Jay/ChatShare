@@ -18,9 +18,9 @@ public:
     void create_connection();
     void drop_connection();
     void check_database();
-    void post_user(std::string user_name, std::string password, bool admin, std::string created_by);
-    void post_msg(std::string user_name, std::string message);           
-    void post_directory(std::string user_name, std::string file_name, std::string file_data);
+    void post_user(const std::string user_name, const std::string password, const bool admin, const std::string created_by);
+    void post_msg(const std::string user_name, const std::string message);           
+    void post_directory(const std::string user_name, const std::string& file_location);
     pqxx::result get_user(std::string user_name);
     pqxx::result get_user_list();
     pqxx::result get_msg_usr(std::string user_name);        

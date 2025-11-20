@@ -5,10 +5,14 @@
 #include "../include/DBEngine.h"
 #include "pqxx/internal/statement_parameters.hxx"
 #include <exception>
+#include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <print>
 #include <chrono>
 #include <iostream>
 #include <string>
+#include <vector>
 
 
 DBEngine::DBEngine() :
@@ -73,22 +77,17 @@ void DBEngine::check_database() {
             id SERIAL PRIMARY KEY, \
             user_name VARCHAR(100), \
             message TEXT, \
-            created TIMESTAMP, \
-            created_by VARCHAR(100), \
-            modified TIMESTAMP, \
-            modified_by VARCHAR(100) \
+            created TIMESTAMP \
             );"
         );
         trx.exec("\
             CREATE TABLE IF NOT EXISTS file_metadata ( \
-            ID INT PRIMARY KEY, \
-            user_name VARCHAR(50), \
+            id SERIAL PRIMARY KEY, \
+            user_name VARCHAR(100), \
             file_name VARCHAR(255) UNIQUE, \
-            file_extension CHAR(50), \
+            file_extension CHAR(100), \
             file_data BYTEA UNIQUE, \
-            created TIMESTAMP, \
-            created_by VARCHAR(100), \
-            active BOOLEAN \
+            created TIMESTAMP \
             );"
         );
         trx.commit();
@@ -109,7 +108,7 @@ void DBEngine::check_database() {
         }
     }
 }
-// TODO: (Add User Info Filter And Verification)
+// TODO: ( Add User Info Filter And Verification )
 void DBEngine::post_user(std::string user_name, std::string password, bool admin, std::string created_by) {
     pqxx::result res;
     std::string db_name = "user_data";
@@ -142,8 +141,8 @@ void DBEngine::post_msg(std::string user_name, std::string message) {
         pqxx::work trx{this->conn};
         res = trx.exec(" \
             INSERT INTO chat_log \
-            (user_name, message, created, created_by) \
-            VALUES ($1, $2, to_timestamp($3), $1) \
+            (user_name, message, created) \
+            VALUES ($1, $2, to_timestamp($3)) \
             ",
             {user_name, message, get_timestamp()}
         );
@@ -155,11 +154,47 @@ void DBEngine::post_msg(std::string user_name, std::string message) {
     }
 }
 
-void DBEngine::post_directory(std::string user_name, std::string file_name, std::string file_data) {
-    
-}
+void DBEngine::post_directory(const std::string user_name, const std::string& file_location) {
+    pqxx::result res;
+    std::ifstream file;
+    std::vector<char> buffer;
 
-pqxx::result DBEngine::get_user(std::string user_name) {     // TODO:( Messages Sent && Files Sent/Received )
+    try {
+        file.open(file_location, std::ios::binary);
+        if (!file.is_open()) throw("[ERROR] Could Not Open File!!!");
+        else
+            buffer.assign((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+        if (buffer.size() > 1000000000) throw("[ERROR] File Size To Large...\tCannot Be Larger Than 1GB!");
+    } catch (std::exception ex) {
+        std::println("[ERROR] Failed To Process File For Database Storage: {}", ex.what());
+        throw;
+    }
+
+    std::filesystem::path file_path = file_location;
+    std::string file_name = file_path.stem();
+    std::string file_extension = file_path.extension();
+    try {
+        std::println("Trying To Post File To Database...");
+        std::string binary_data(buffer.begin(), buffer.end());
+        pqxx::work trx{this->conn};
+        res = trx.exec(" \
+            INSERT INTO file_metadata \
+            (user_name, file_name, file_extension, file_data, created) \
+            VALUES ($1, $2, $3, $4, to_timestamp($5)) \
+            ON CONFLICT (file_name) DO NOTHING; \
+            ",
+            {user_name, file_name, file_extension, binary_data, get_timestamp()}
+        );
+        trx.commit();
+        std::println("Successfully Added File To Database!");
+    } catch (std::exception ex) {
+        std::println("[ERROR] Failed To Post File To Database: {}", ex.what());
+        throw;
+    }
+}
+// TODO:( Messages Sent && Files Sent/Received )
+pqxx::result DBEngine::get_user(std::string user_name) {
     pqxx::result res;
 
     try {
@@ -236,11 +271,41 @@ pqxx::result DBEngine::get_msg_log() {
 }
 
 pqxx::result DBEngine::get_directory(std::string file_name) {
+    pqxx::result res;
 
+    try {
+        std::println("Trying To Get File: {}", file_name);
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            SELECT * FROM file_metadata WHERE file_name=$1 \
+            ", pqxx::params{file_name}
+        );
+        trx.commit();
+        std::println("Successfully Retrieved File: {}", file_name);
+        return res;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get File: {}", ex.what());
+        throw;
+    }
 }
 
 pqxx::result DBEngine::get_directory_list() {
+    pqxx::result res;
 
+    try {
+        std::println("Trying To Get Files...");
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            SELECT * FROM file_metadata; \
+            "
+        );
+        trx.commit();
+        std::println("Successfully Retrieved All Files!");
+        return res;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get Files: {}", ex.what());
+        throw;
+    }
 }
 
 

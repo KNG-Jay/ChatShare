@@ -3,6 +3,7 @@
 //
 
 #include "../db-engine/include/DBEngine.h"
+#include "pqxx/internal/statement_parameters.hxx"
 #include <cstddef>
 #include <gtest/gtest.h>
 #include <print>
@@ -26,7 +27,7 @@ TEST(DBEngineTests, CheckDBIntegrity) {
     ASSERT_EQ(engine.table_count, 3);
 }
 
-TEST(DBEngineTests, UserDataTransaction) {     // TODO: ( get_user(std::string user_name) || get_user_list() )
+TEST(DBEngineTests, UserDataTransaction) {
     DBEngine engine;
     engine.create_connection();
     engine.check_database();
@@ -63,7 +64,7 @@ TEST(DBEngineTests, ChatDataTransaction) {
     pqxx::result res = trx.exec("SELECT * FROM chat_log LIMIT 0;");
     std::size_t num_columns = res.columns();
     trx.abort();
-    ASSERT_EQ(num_columns, 7);
+    ASSERT_EQ(num_columns, 4);
 
     res = engine.get_msg_usr(user_name);
     ASSERT_TRUE(res.size() > 0);
@@ -72,11 +73,27 @@ TEST(DBEngineTests, ChatDataTransaction) {
     ASSERT_TRUE(res.size() > 0);
 }
 
-TEST(DBEngineTests, FileDataTransaction) {      // TODO: ( post_directory(std::string user_name, std::string file_name, std::string file_data) || get_directory(std::string file_name) || get_directory_list() )
+TEST(DBEngineTests, FileDataTransaction) {      
     DBEngine engine;
     engine.create_connection();
     engine.check_database();
     
+    std::string user_name = "system";
+    std::string file_location = "vcpkg.json";
+    engine.post_directory(user_name, file_location);
+
+    pqxx::work trx{engine.conn};
+    pqxx::result res = trx.exec("SELECT * FROM file_metadata LIMIT 0;");
+    std::size_t num_columns = res.columns();
+    trx.abort();
+    ASSERT_EQ(num_columns, 6);
+
+    std::filesystem::path file_path = file_location;
+    res = engine.get_directory(file_path.stem());
+    ASSERT_TRUE(res.size() > 0);
+
+    res = engine.get_directory_list();
+    ASSERT_TRUE(res.size() > 0);
 }
 
 TEST(DBEngineTests, TimestampFunctional) {
