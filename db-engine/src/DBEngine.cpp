@@ -9,7 +9,6 @@
 #include <chrono>
 #include <iostream>
 #include <string>
-#include <system_error>
 
 
 DBEngine::DBEngine() :
@@ -54,34 +53,44 @@ void DBEngine::check_database() {
         throw;
     }
 
-    if (this->table_count > 4 && this->table_count < 3) {
+    if (this->table_count < 3 || this->table_count > 4) {
         try { 
         pqxx::work trx{this->conn};
         trx.exec("\
             CREATE TABLE IF NOT EXISTS user_data ( \
-            ID INT PRIMARY KEY, \
-            user_name VARCHAR(50), \
-            password VARCHAR(50), \
+            id SERIAL PRIMARY KEY, \
+            user_name VARCHAR(100) UNIQUE, \
+            password VARCHAR(100), \
             admin BOOLEAN, \
             created TIMESTAMP, \
-            modified TIMESTAMP \
-            );");
+            created_by VARCHAR(100), \
+            modified TIMESTAMP, \
+            modified_by VARCHAR(100) \
+            );"
+        );
         trx.exec("\
             CREATE TABLE IF NOT EXISTS chat_log ( \
-            ID INT PRIMARY KEY, \
-            user_name VARCHAR(50), \
+            id SERIAL PRIMARY KEY, \
+            user_name VARCHAR(100), \
             message TEXT, \
-            created TIMESTAMP \
-            );");
+            created TIMESTAMP, \
+            created_by VARCHAR(100), \
+            modified TIMESTAMP, \
+            modified_by VARCHAR(100) \
+            );"
+        );
         trx.exec("\
             CREATE TABLE IF NOT EXISTS file_metadata ( \
             ID INT PRIMARY KEY, \
             user_name VARCHAR(50), \
-            file_name VARCHAR(255), \
+            file_name VARCHAR(255) UNIQUE, \
             file_extension CHAR(50), \
-            file_data BYTEA, \
-            created TIMESTAMP \
-            );");
+            file_data BYTEA UNIQUE, \
+            created TIMESTAMP, \
+            created_by VARCHAR(100), \
+            active BOOLEAN \
+            );"
+        );
         trx.commit();
         } catch(const std::exception& ex) {
             std::println("[ERROR] FAILED TO CREATE TABLES: {}", ex.what());
@@ -100,16 +109,137 @@ void DBEngine::check_database() {
         }
     }
 }
+// TODO: (Add User Info Filter And Verification)
+void DBEngine::post_user(std::string user_name, std::string password, bool admin, std::string created_by) {
+    pqxx::result res;
+    std::string db_name = "user_data";
 
-void DBEngine::post_user(std::string user_name, std::string name, bool admin) {
+    try {
+        std::println("Trying To Add User To Database...");
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            INSERT INTO user_data \
+            (user_name, password, admin, created, created_by) \
+            VALUES ($1, $2, $3, to_timestamp($4), $5) \
+            ON CONFLICT (user_name) DO NOTHING; \
+            ",
+            {user_name, password, admin, get_timestamp(), created_by}
+        );
+        trx.commit();
+        std::println("Successfully Added User To Database!");
+    } catch(std::exception ex) {
+        std::println("[Error] Failed To Add User To Database: {}", ex.what());
+        throw;
+    }
+}
 
+void DBEngine::post_msg(std::string user_name, std::string message) {
+    pqxx::result res;
+    std::string db_name = "chat_log";
+
+    try {
+        std::println("Trying To Post Message To Database...");
+        pqxx::work trx{this->conn};
+        res = trx.exec(" \
+            INSERT INTO chat_log \
+            (user_name, message, created, created_by) \
+            VALUES ($1, $2, to_timestamp($3), $1) \
+            ",
+            {user_name, message, get_timestamp()}
+        );
+        trx.commit();
+        std::println("Successfully Added Message To Database!");
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Post Message To Database: {}", ex.what());
+        throw;
+    }
+}
+
+void DBEngine::post_directory(std::string user_name, std::string file_name, std::string file_data) {
+    
 }
 
 pqxx::result DBEngine::get_user(std::string user_name) {     // TODO:( Messages Sent && Files Sent/Received )
+    pqxx::result res;
 
+    try {
+        std::println("Trying To Get User: {}", user_name);
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            SELECT * FROM user_data WHERE user_name=$1 \
+            ", pqxx::params{user_name}
+        );
+        trx.commit();
+        std::println("Successfully Retrieved Data For: {}", user_name);
+        return res;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get User Data: {}", ex.what());
+        throw;
+    }
 }
 
 pqxx::result DBEngine::get_user_list() {
+    pqxx::result res;
+
+    try {
+        std::println("Trying To Get User List...");
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            SELECT * FROM user_data; \
+            "
+        );
+        trx.commit();
+        std::println("Successfully Retrieved The User List!");
+        return res;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get Users List: {}", ex.what());
+        throw;
+    }
+}
+
+pqxx::result DBEngine::get_msg_usr(std::string user_name) {
+    pqxx::result res;
+
+    try {
+        std::println("Trying To Get Messages For User: {}", user_name);
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            SELECT * FROM chat_log WHERE user_name=$1 \
+            ", pqxx::params{user_name}
+        );
+        trx.commit();
+        std::println("Successfully Retrieved Messages For User: {}", user_name);
+        return res;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get User Messages: {}", ex.what());
+        throw;
+    }
+}
+
+pqxx::result DBEngine::get_msg_log() {
+    pqxx::result res;
+
+    try {
+        std::println("Trying To Get Messages...");
+        pqxx::work trx{this->conn};
+        res = trx.exec("\
+            SELECT * FROM chat_log; \
+            "
+        );
+        trx.commit();
+        std::println("Successfully Retrieved All Messages!");
+        return res;
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Get Messages: {}", ex.what());
+        throw;
+    }
+}
+
+pqxx::result DBEngine::get_directory(std::string file_name) {
+
+}
+
+pqxx::result DBEngine::get_directory_list() {
 
 }
 
