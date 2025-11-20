@@ -9,11 +9,15 @@
 #include <pqxx/pqxx>
 #include <string>
 
-
+// TODO: ( Incorporate UPDATE And DELETE Functionality )
 class DBEngine {
 public:
     DBEngine();
     ~DBEngine();
+
+    std::string conn_string;
+    pqxx::connection conn;
+    int table_count;
 
     void create_connection();
     void drop_connection();
@@ -27,10 +31,6 @@ public:
     pqxx::result get_msg_log();     
     pqxx::result get_directory(std::string file_name);      
     pqxx::result get_directory_list();      
-
-    std::string conn_string;
-    pqxx::connection conn;
-    int table_count;
 
 private:
 
