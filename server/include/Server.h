@@ -53,7 +53,7 @@ public:
     void startup();
     void shutdown();
     Account login(const std::string& user_name, const std::string& password);
-    void logout(const std::string& user_name);
+    void logout(Account account);
 
 private:
 

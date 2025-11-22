@@ -16,8 +16,6 @@ Account::Account(const std::string& user_name, const std::string& password) :
         std::map<std::string, std::string> field_values;
         try {
             DBEngine engine;
-            engine.create_connection();
-            engine.check_database();
             pqxx::result res = engine.get_user(user_name);
             for (auto const &field: res[0]) field_values.insert_or_assign(field.name(), field.c_str());
             if (password != field_values.at("password")) {
@@ -92,12 +90,13 @@ Account Server::login(const std::string& user_name, const std::string& password)
     return account;
 }
 
-void Server::logout(const std::string& user_name) {
+void Server::logout(Account account) {
     try {
         std::println("Trying To Logout...");
-        if (this->users_online.contains(user_name)) {
+        if (this->users_online.contains(account.get_username())) {
             // TODO: ( Proccess And Remove User To users_online )
-            this->users_online.at(user_name).erase();
+
+            this->users_online.at(account.get_username()).erase();
             std::println("Successfully Logged Out Of Server!");
         } else
             throw("[ERROR] Failed To Find user In users_online!");

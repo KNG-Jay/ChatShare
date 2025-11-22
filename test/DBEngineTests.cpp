@@ -9,28 +9,22 @@
 #include <print>
 #include <string>
 
-TEST(DBEngineTests, CreateConnection) {
+
+TEST(DBEngineTests, DBEngineStartup) {
     DBEngine engine;
 
     engine.create_connection();
     ASSERT_TRUE(engine.conn.is_open());
 
+    engine.check_database();
+    ASSERT_EQ(engine.table_count, 3);
+
     engine.drop_connection();
     ASSERT_FALSE(engine.conn.is_open());
 }
 
-TEST(DBEngineTests, CheckDBIntegrity) {
-    DBEngine engine;
-    engine.create_connection();
-
-    engine.check_database();
-    ASSERT_EQ(engine.table_count, 3);
-}
-
 TEST(DBEngineTests, UserDataTransaction) {
     DBEngine engine;
-    engine.create_connection();
-    engine.check_database();
 
     std::string user_name = "test";
     std::string password = "test";
@@ -53,8 +47,6 @@ TEST(DBEngineTests, UserDataTransaction) {
 
 TEST(DBEngineTests, ChatDataTransaction) {
     DBEngine engine;
-    engine.create_connection();
-    engine.check_database();
 
     std::string user_name = "system";
     std::string message = "test message";
@@ -75,11 +67,9 @@ TEST(DBEngineTests, ChatDataTransaction) {
 
 TEST(DBEngineTests, FileDataTransaction) {      
     DBEngine engine;
-    engine.create_connection();
-    engine.check_database();
     
     std::string user_name = "system";
-    std::string file_location = "vcpkg.json";
+    std::string file_location = "/home/kng/Documents/cppProjects/ChatShare/vcpkg.json";
     engine.post_directory(user_name, file_location);
 
     pqxx::work trx{engine.conn};
