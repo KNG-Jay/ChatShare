@@ -5,9 +5,12 @@
 #ifndef CHATSHARE_SERVER_H
 #define CHATSHARE_SERVER_H
 
-#include "../db-engine/include/DBEngine.h"
+
+#include "../../db-engine/include/DBEngine.h"
 #include <boost/asio.hpp>
 #include <Poco/Poco.h>
+#include <Poco/File.h>
+#include <Poco/Path.h>
 #include <string>
 
 
@@ -18,14 +21,14 @@ public:
 
     int login_timestamp;
 
-    void set_password(std::string new_password);    // TODO
-    void set_admin(bool admin_status);      // TODO
-    int get_id();   // TODO
-    std::string get_username();     // TODO
-    std::string get_password();     // TODO
-    bool get_admin();       // TODO
-    std::string get_creation_info();    // TODO
-    std::string get_modified_info();    // TODO
+    void set_password(std::string new_password);    
+    void set_admin(bool admin_status);      
+    int get_id();   
+    std::string get_username();     
+    std::string get_password();     
+    bool get_admin();       
+    std::string get_creation_info();    
+    std::string get_modified_info();    
 
 private:
     int id;
@@ -38,6 +41,7 @@ private:
     std::string modified_by;
 
 };
+
 
 class Server {
 public:
