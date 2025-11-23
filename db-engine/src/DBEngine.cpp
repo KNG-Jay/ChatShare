@@ -15,7 +15,8 @@
 
 
 DBEngine::DBEngine() :
-    conn_string("host=localhost port=5432 user=kng password=Recon777 dbname=chatshare connect_timeout=15") {
+    conn_string("host=localhost port=5432 user=kng password=Recon777 dbname=chatshare connect_timeout=15")
+    {
         create_connection();
         check_database();
     }
@@ -23,7 +24,8 @@ DBEngine::DBEngine() :
 DBEngine::~DBEngine() {}
 
 
-void DBEngine::create_connection() {
+void DBEngine::create_connection() 
+{
     try {
         std::println("Trying To Connect To The Database...");
         this->conn = pqxx::connection(this->conn_string);
@@ -35,7 +37,8 @@ void DBEngine::create_connection() {
     }
 }
 
-void DBEngine::drop_connection() {
+void DBEngine::drop_connection() 
+{
     try {
         std::println("Trying To Close Connection...");
         this->conn.close();
@@ -45,7 +48,8 @@ void DBEngine::drop_connection() {
     }
 }
 
-void DBEngine::check_database() {
+void DBEngine::check_database() 
+{
     pqxx::result res;
 
     try {
@@ -111,7 +115,8 @@ void DBEngine::check_database() {
     }
 }
 // TODO: ( Add User Info Filter And Verification )
-void DBEngine::post_user(std::string user_name, std::string password, bool admin, std::string created_by) {
+void DBEngine::post_user(std::string user_name, std::string password, bool admin, std::string created_by) 
+{
     pqxx::result res;
     std::string db_name = "user_data";
 
@@ -134,7 +139,8 @@ void DBEngine::post_user(std::string user_name, std::string password, bool admin
     }
 }
 
-void DBEngine::post_msg(std::string user_name, std::string message) {
+void DBEngine::post_msg(std::string user_name, std::string message) 
+{
     pqxx::result res;
     std::string db_name = "chat_log";
 
@@ -156,7 +162,8 @@ void DBEngine::post_msg(std::string user_name, std::string message) {
     }
 }
 
-void DBEngine::post_directory(const std::string user_name, const std::string& file_location) {
+void DBEngine::post_directory(const std::string user_name, const std::string& file_location) 
+{
     pqxx::result res;
     std::ifstream file;
     std::vector<char> buffer;
@@ -196,7 +203,8 @@ void DBEngine::post_directory(const std::string user_name, const std::string& fi
     }
 }
 // TODO:( Messages Sent && Files Sent/Received )
-pqxx::result DBEngine::get_user(std::string user_name) {
+pqxx::result DBEngine::get_user(std::string user_name) 
+{
     pqxx::result res;
 
     try {
@@ -215,7 +223,8 @@ pqxx::result DBEngine::get_user(std::string user_name) {
     }
 }
 
-pqxx::result DBEngine::get_user_list() {
+pqxx::result DBEngine::get_user_list() 
+{
     pqxx::result res;
 
     try {
@@ -234,7 +243,8 @@ pqxx::result DBEngine::get_user_list() {
     }
 }
 
-pqxx::result DBEngine::get_msg_usr(std::string user_name) {
+pqxx::result DBEngine::get_msg_usr(std::string user_name) 
+{
     pqxx::result res;
 
     try {
@@ -253,7 +263,8 @@ pqxx::result DBEngine::get_msg_usr(std::string user_name) {
     }
 }
 
-pqxx::result DBEngine::get_msg_log() {
+pqxx::result DBEngine::get_msg_log() 
+{
     pqxx::result res;
 
     try {
@@ -272,7 +283,8 @@ pqxx::result DBEngine::get_msg_log() {
     }
 }
 
-pqxx::result DBEngine::get_directory(std::string file_name) {
+pqxx::result DBEngine::get_directory(std::string file_name) 
+{
     pqxx::result res;
 
     try {
@@ -291,7 +303,8 @@ pqxx::result DBEngine::get_directory(std::string file_name) {
     }
 }
 
-pqxx::result DBEngine::get_directory_list() {
+pqxx::result DBEngine::get_directory_list() 
+{
     pqxx::result res;
 
     try {
@@ -311,7 +324,8 @@ pqxx::result DBEngine::get_directory_list() {
 }
 
 
-std::time_t get_timestamp() {
+std::time_t get_timestamp() 
+{
     std::println("Retrieving Timestamp In UTC...");
     std::chrono::utc_clock clock;
 

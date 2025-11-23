@@ -79,7 +79,7 @@ target_include_directories(runUnitTests PUBLIC
 add_library(shared SHARED src/main.cpp)
 
 target_link_libraries(shared PUBLIC reflectcpp::reflectcpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE shared db-engine)
+target_link_libraries(${PROJECT_NAME} PRIVATE shared db-engine server)
 target_link_libraries(runUnitTests PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main db-engine)
 
 enable_testing()

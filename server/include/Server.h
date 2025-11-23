@@ -7,6 +7,9 @@
 
 
 #include "../../db-engine/include/DBEngine.h"
+#include <boost/asio/io_context.hpp>
+#include <rfl/json.hpp>
+#include <rfl.hpp>
 #include <boost/asio.hpp>
 #include <Poco/Poco.h>
 #include <Poco/File.h>
@@ -49,11 +52,15 @@ public:
     ~Server();
 
     std::unordered_map<std::string, std::string> users_online;     // <user_name, time_online>
+    boost::asio::io_context io;
+    boost::asio::ip::tcp::acceptor acceptor_;
+    short port;
 
     void startup();
     void shutdown();
     Account login(const std::string& user_name, const std::string& password);
     void logout(Account account);
+    void do_accept();
 
 private:
 
