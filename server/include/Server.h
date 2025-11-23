@@ -17,7 +17,8 @@
 #include <string>
 
 
-class Account {
+class Account 
+{
 public:
     Account(const std::string& user_name, const std::string& password);
     ~Account();
@@ -46,7 +47,8 @@ private:
 };
 
 
-class Server {
+class Server 
+{
 public:
     Server();
     ~Server();

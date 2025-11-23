@@ -19,7 +19,7 @@ DBEngine::DBEngine() :
     {
         create_connection();
         check_database();
-    }
+}
     
 DBEngine::~DBEngine() {}
 

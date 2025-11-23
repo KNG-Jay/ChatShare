@@ -10,7 +10,8 @@
 #include <string>
 
 // TODO: ( Incorporate UPDATE And DELETE Functionality )
-class DBEngine {
+class DBEngine 
+{
 public:
     DBEngine();
     ~DBEngine();

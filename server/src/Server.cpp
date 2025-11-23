@@ -41,7 +41,7 @@ Account::Account(const std::string& user_name, const std::string& password) :
             std::println("[ERROR] Failed To Populate Account: {}", ex.what());
             throw;
         }
-    }
+}
 Account::~Account() {}
 
 void Account::set_password(std::string new_password) 
