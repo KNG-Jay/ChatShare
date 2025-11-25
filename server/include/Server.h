@@ -8,6 +8,7 @@
 
 #include "../../db-engine/include/DBEngine.h"
 #include <boost/asio/io_context.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <rfl/json.hpp>
 #include <rfl.hpp>
 #include <boost/asio.hpp>
@@ -47,6 +48,23 @@ private:
 };
 
 
+class Session : public std::enable_shared_from_this<Session>
+{
+public:
+    Session(boost::asio::ip::tcp::socket socket);
+    ~Session();
+
+    void start();
+
+private:
+    boost::asio::ip::tcp::socket socket_;
+    char data_[1024];
+
+    void do_read();
+
+};
+
+
 class Server 
 {
 public:
@@ -55,7 +73,6 @@ public:
 
     std::unordered_map<std::string, std::string> users_online;     // <user_name, time_online>
     boost::asio::io_context io;
-    boost::asio::ip::tcp::acceptor acceptor_;
     short port;
 
     void startup();
@@ -65,7 +82,25 @@ public:
     void do_accept();
 
 private:
+    boost::asio::ip::tcp::acceptor acceptor_;
 
+};
+
+
+struct Message {
+    int id;
+    std::string user_name;
+    std::string message;
+    std::string created;
+};
+
+struct File {
+    int id;
+    std::string user_name;
+    std::string file_name;
+    std::string file_extension;
+    std::string binary_data;
+    std::string created;
 };
 
 

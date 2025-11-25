@@ -14,11 +14,11 @@
 #include <vector>
 
 
-DBEngine::DBEngine() :
-    conn_string("host=localhost port=5432 user=kng password=Recon777 dbname=chatshare connect_timeout=15")
-    {
-        create_connection();
-        check_database();
+DBEngine::DBEngine()
+    : conn_string("host=localhost port=5432 user=kng password=Recon777 dbname=chatshare connect_timeout=15")
+{
+    create_connection();
+    check_database();
 }
     
 DBEngine::~DBEngine() {}
@@ -326,14 +326,15 @@ pqxx::result DBEngine::get_directory_list()
 
 std::time_t get_timestamp() 
 {
-    std::println("Retrieving Timestamp In UTC...");
     std::chrono::utc_clock clock;
 
     try {
+        std::println("Trying To Retrieve Timestamp In UTC...");
         const std::chrono::time_point now = clock.now();
         const auto time_since_epoch = now.time_since_epoch();
         const std::time_t utc_stamp =
             std::chrono::duration_cast<std::chrono::seconds>(time_since_epoch).count();
+        std::println("Successfully Returned Timestamp!");
         return utc_stamp;
     } catch(std::exception ex) {
         std::println("[ERROR] Failed To Get Timestamp: {}", ex.what());

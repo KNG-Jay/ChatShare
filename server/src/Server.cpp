@@ -5,6 +5,7 @@
 #include "../include/Server.h"
 #include "pqxx/internal/statement_parameters.hxx"
 #include <algorithm>
+#include <boost/asio/ip/tcp.hpp>
 #include <boost/system/detail/error_code.hpp>
 #include <exception>
 #include <map>
@@ -16,31 +17,32 @@
 using boost::asio::ip::tcp;
 
 
-Account::Account(const std::string& user_name, const std::string& password) :
-    user_name(user_name), password(password) 
-    {
-        std::map<std::string, std::string> field_values;
-        try {
-            DBEngine engine;
-            pqxx::result res = engine.get_user(user_name);
-            for (auto const &field: res[0]) field_values.insert_or_assign(field.name(), field.c_str());
-            if (password != field_values.at("password")) {
-                throw("Password Was Incorrect!");
-            } else {
-                this->id = std::stoi(field_values.at("id"));
-                this->user_name = field_values.at("user_name");
-                this->password = field_values.at("password");
-                this->admin = (field_values.at("admin") != "false");
-                this->created = field_values.at("created");
-                this->created_by = field_values.at("created_by");
-                this->modified = field_values.at("modified");
-                this->modified_by = field_values.at("modified_by");
-                this->login_timestamp = get_timestamp();
-            }
-        } catch(std::exception ex) {
-            std::println("[ERROR] Failed To Populate Account: {}", ex.what());
-            throw;
+Account::Account(const std::string& user_name, const std::string& password)
+    : user_name(user_name),
+    password(password) 
+{
+    std::map<std::string, std::string> field_values;
+    try {
+        DBEngine engine;
+        pqxx::result res = engine.get_user(user_name);
+        for (auto const &field: res[0]) field_values.insert_or_assign(field.name(), field.c_str());
+        if (password != field_values.at("password")) {
+            throw("Password Was Incorrect!");
+        } else {
+            this->id = std::stoi(field_values.at("id"));
+            this->user_name = field_values.at("user_name");
+            this->password = field_values.at("password");
+            this->admin = (field_values.at("admin") != "false");
+            this->created = field_values.at("created");
+            this->created_by = field_values.at("created_by");
+            this->modified = field_values.at("modified");
+            this->modified_by = field_values.at("modified_by");
+            this->login_timestamp = get_timestamp();
         }
+    } catch(std::exception ex) {
+        std::println("[ERROR] Failed To Populate Account: {}", ex.what());
+        throw;
+    }
 }
 Account::~Account() {}
 
@@ -87,9 +89,31 @@ std::string Account::get_modified_info()
 }
 
 
-Server::Server() :
-    acceptor_(this->io, tcp::endpoint(tcp::v4(), port = 8081))
-    {
+Session::Session(tcp::socket socket)
+    : socket_(std::move(socket)) {}
+Session::~Session() {}
+
+void Session::start() 
+{
+    do_read();
+}
+
+void Session::do_read()
+{
+    auto self(shared_from_this());
+    boost::asio::async_read(socket_, boost::asio::buffer(data_),
+        [this, self](boost::system::error_code ec, std::size_t length) {
+            if (!ec) {
+                do_read();
+            }
+        }
+    );
+}
+
+
+Server::Server()
+    : acceptor_(this->io, tcp::endpoint(tcp::v4(), port = 8081))
+{
     // TODO: ( DEFAULT SERVER STARTUP IMPLEMENTATION )
     do_accept();
 }
@@ -130,7 +154,7 @@ void Server::do_accept()
     acceptor_.async_accept(
         [this](boost::system::error_code ec, tcp::socket socket) {
             if (!ec) {
-                //std::make_shared<Session>(std::move(socket))->start();
+                std::make_shared<Session>(std::move(socket))->start();
             }
             do_accept();
         }
