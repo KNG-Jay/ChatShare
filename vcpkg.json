@@ -9,6 +9,7 @@
     "boost-system",
     "gtest",
     "poco",
-    "reflectcpp"
+    "reflectcpp",
+    "vcpkg-tool-bazel"
   ]
 }

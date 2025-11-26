@@ -6,3 +6,6 @@ vcpkg_installed/
 .vscode/
 ChatShare.session.sql
 Testing/
+*.bazel
+*.bazel.*
+bazel*
