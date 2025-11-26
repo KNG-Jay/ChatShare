@@ -15,7 +15,7 @@
 
 
 DBEngine::DBEngine()
-    : conn_string("host=localhost port=5432 user=kng password=Recon777 dbname=chatshare connect_timeout=15")
+  : conn_string("host=localhost port=5432 user=kng password=Recon777 dbname=chatshare connect_timeout=15")
 {
     create_connection();
     check_database();

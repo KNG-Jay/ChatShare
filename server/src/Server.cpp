@@ -12,13 +12,14 @@
 #include <memory>
 #include <print>
 #include <sstream>
+#include <thread>
 #include <string>
 
 using boost::asio::ip::tcp;
 
 
 Account::Account(const std::string& user_name, const std::string& password)
-    : user_name(user_name),
+  : user_name(user_name),
     password(password) 
 {
     std::map<std::string, std::string> field_values;
