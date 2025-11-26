@@ -115,7 +115,7 @@ void DBEngine::check_database()
     }
 }
 // TODO: ( Add User Info Filter And Verification )
-void DBEngine::post_user(std::string user_name, std::string password, bool admin, std::string created_by) 
+void DBEngine::post_user(const std::string& user_name, const std::string& password, const bool& admin, const std::string& created_by) 
 {
     pqxx::result res;
     std::string db_name = "user_data";
@@ -139,7 +139,7 @@ void DBEngine::post_user(std::string user_name, std::string password, bool admin
     }
 }
 
-void DBEngine::post_msg(std::string user_name, std::string message) 
+void DBEngine::post_msg(const std::string& user_name, const std::string& message) 
 {
     pqxx::result res;
     std::string db_name = "chat_log";
@@ -162,7 +162,7 @@ void DBEngine::post_msg(std::string user_name, std::string message)
     }
 }
 
-void DBEngine::post_directory(const std::string user_name, const std::string& file_location) 
+void DBEngine::post_directory(const std::string& user_name, const std::string& file_location) 
 {
     pqxx::result res;
     std::ifstream file;
@@ -203,7 +203,7 @@ void DBEngine::post_directory(const std::string user_name, const std::string& fi
     }
 }
 // TODO:( Messages Sent && Files Sent/Received )
-pqxx::result DBEngine::get_user(std::string user_name) 
+pqxx::result DBEngine::get_user(std::string& user_name) 
 {
     pqxx::result res;
 
@@ -243,7 +243,7 @@ pqxx::result DBEngine::get_user_list()
     }
 }
 
-pqxx::result DBEngine::get_msg_usr(std::string user_name) 
+pqxx::result DBEngine::get_msg_usr(std::string& user_name) 
 {
     pqxx::result res;
 
@@ -283,7 +283,7 @@ pqxx::result DBEngine::get_msg_log()
     }
 }
 
-pqxx::result DBEngine::get_directory(std::string file_name) 
+pqxx::result DBEngine::get_directory(std::string& file_name) 
 {
     pqxx::result res;
 

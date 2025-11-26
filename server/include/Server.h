@@ -26,8 +26,8 @@ public:
 
     int login_timestamp;
 
-    void set_password(std::string new_password);    
-    void set_admin(bool admin_status);      
+    void set_password(const std::string& new_password);    
+    void set_admin(const bool& admin_status);      
     int get_id();   
     std::string get_username();     
     std::string get_password();     
@@ -36,14 +36,14 @@ public:
     std::string get_modified_info();    
 
 private:
-    int id;
-    std::string user_name;
-    std::string password;
-    bool admin;
-    std::string created;
-    std::string created_by;
-    std::string modified;
-    std::string modified_by;
+    int id_;
+    std::string user_name_;
+    std::string password_;
+    bool admin_;
+    std::string created_;
+    std::string created_by_;
+    std::string modified_;
+    std::string modified_by_;
 
 };
 
@@ -51,7 +51,7 @@ private:
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(boost::asio::ip::tcp::socket socket);
+    Session(boost::asio::ip::tcp::socket& socket);
     ~Session();
 
     void start();

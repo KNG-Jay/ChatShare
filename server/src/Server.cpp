@@ -19,25 +19,25 @@ using boost::asio::ip::tcp;
 
 
 Account::Account(const std::string& user_name, const std::string& password)
-  : user_name(user_name),
-    password(password) 
+  : user_name_(user_name),
+    password_(password) 
 {
     std::map<std::string, std::string> field_values;
     try {
         DBEngine engine;
-        pqxx::result res = engine.get_user(user_name);
+        pqxx::result res = engine.get_user(user_name_);
         for (auto const &field: res[0]) field_values.insert_or_assign(field.name(), field.c_str());
         if (password != field_values.at("password")) {
             throw("Password Was Incorrect!");
         } else {
-            this->id = std::stoi(field_values.at("id"));
-            this->user_name = field_values.at("user_name");
-            this->password = field_values.at("password");
-            this->admin = (field_values.at("admin") != "false");
-            this->created = field_values.at("created");
-            this->created_by = field_values.at("created_by");
-            this->modified = field_values.at("modified");
-            this->modified_by = field_values.at("modified_by");
+            this->id_ = std::stoi(field_values.at("id"));
+            this->user_name_ = field_values.at("user_name");
+            this->password_ = field_values.at("password");
+            this->admin_ = (field_values.at("admin") != "false");
+            this->created_ = field_values.at("created");
+            this->created_by_ = field_values.at("created_by");
+            this->modified_ = field_values.at("modified");
+            this->modified_by_ = field_values.at("modified_by");
             this->login_timestamp = get_timestamp();
         }
     } catch(std::exception ex) {
@@ -47,50 +47,50 @@ Account::Account(const std::string& user_name, const std::string& password)
 }
 Account::~Account() {}
 
-void Account::set_password(std::string new_password) 
+void Account::set_password(const std::string& new_password) 
 {
-    this->password = new_password;
+    this->password_ = new_password;
 }
 
-void Account::set_admin(bool admin_status) 
+void Account::set_admin(const bool& admin_status) 
 {
-    this->admin = admin_status;
+    this->admin_ = admin_status;
 }
 
 int Account::get_id() 
 {
-    return this->id;
+    return this->id_;
 }
 
 std::string Account::get_username() 
 {
-    return this->user_name;
+    return this->user_name_;
 }
 
 std::string Account::get_password() 
 {
-    return this->password;
+    return this->password_;
 }
 
 bool Account::get_admin() 
 {
-    return this->admin;
+    return this->admin_;
 }
 
 std::string Account::get_creation_info() 
 {
-    std::string info_str("Created By: " + this->created_by + " On: " + this->created);
+    std::string info_str("Created By: " + this->created_by_ + " On: " + this->created_);
     return info_str;
 }
 
 std::string Account::get_modified_info() 
 {
-    std::string info_str("Modified By: " + this->modified_by + "On: " + this->modified);
+    std::string info_str("Modified By: " + this->modified_by_ + "On: " + this->modified_);
     return info_str;
 }
 
 
-Session::Session(tcp::socket socket)
+Session::Session(tcp::socket& socket)
     : socket_(std::move(socket)) {}
 Session::~Session() {}
 
